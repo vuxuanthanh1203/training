@@ -20,6 +20,8 @@ const typeDefs = gql`
         updateCategory(id:ID!,name:String): Boolean!
 
         createProduct(name: String!, des: String!, categoryId: ID!): Product!
+
+        createUser(name: String!, email: String!): User!
     }
 
     type Category {
@@ -32,13 +34,13 @@ const typeDefs = gql`
         id: ID!
         name: String!
         des: String!
-        category: Category!
+        category: Category
     }
 
     type User {
         id: ID!
         name: String!
-        email: String!
+        email: String
     }
 `
 module.exports = typeDefs;

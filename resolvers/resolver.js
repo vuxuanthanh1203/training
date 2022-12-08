@@ -1,59 +1,36 @@
-const users = require('../data/users');
-const products = require('../data/products');
-const categories = require('../data/categories');
+// const sequelize = require('sequelize');
+const User = require('../models').User;
+const Product = require('../models').Product;
+const Category = require('../models').Category;
 
 const resolves = {
     // QUERY
     Query: {
-        products: () => products,
-        product: (parent, args) => products.find(product => product.id === args.id * 1),
-        users: () => users,
-        user: (parent, args) => users.find(user => user.id === args.id * 1),
-        categories: () => categories,
-        category: (parent, args) => categories.find(category => category.id === args.id * 1)
+        categories: async (parent, args, { queryData }) => await queryData.getAllCategory(),
+        category: async (parent, { id }, { queryData }) => await queryData.getCategoryById(id),
+
+        products: async (parent, args, { queryData }) => await queryData.getAllProducts(),
+        product: async (parent, { id }, { queryData }) => await queryData.getProductById(id),
+
+        users: async (parent, args, { queryData }) => await queryData.getAllUsers(),
+        user: async (parent, { id }, { queryData }) => await queryData.getUserById(id),
     },
     Product: {
-        category: (parent, args) => {
-            return categories.find(category => category.id === parent.categoryId * 1);
-        }
+        category: async ({ categoryId }, args, { queryData }) => await queryData.getCategoryById(categoryId),
     },
     Category: {
-        products: (parent, args) => {
-            // console.log(parent);
-            return products.filter(product => product.categoryId === parent.id);
-        }
+        products: async ({ id }, args, { queryData }) => await queryData.getAllProducts(id),
     },
 
     //MUTATION
     Mutation: {
-        createCategory: (parent, args) => {
-            const { name } = args
-            const category = { id: categories.length + 1, name }
-            categories.push(category)
-            return category
-        },
-        deleteCategory: (parent, args) => {
-            const categoryIndex = categories.findIndex(category => category.id == args.id)
-            let flag = false
-            if (categoryIndex != -1) {
-                categories.splice(categoryIndex, 1);
-                flag = true
-            }
-            return flag;
-        },
-        updateCategory: (parent, args) => {
-            const categoryIndex = categories.findIndex(category => category.id == args.id)
-            const { name } = args
-            let flag = false
-            if (categoryIndex != -1) {
-                if (name) {
-                    categories[categoryIndex].name = name
-                    flag = true
-                }
-            }
-            return flag;
-        },
-        createProduct: (parent, args) => { console.log(args) }
+        createCategory: async (parent, args, { queryData }) => await queryData.createCategory(args),
+
+        deleteCategory: async (parent, args, { queryData }) => await queryData.deleteCategory(args),
+        updateCategory: async (parent, args, { queryData }) => await queryData.updateCategory(args),
+        createProduct: async (parent, args, { queryData }) => await queryData.createProduct(args),
+
+        createUser: async (parent, args, { queryData }) => await queryData.createUser(args),
     }
 
 }
